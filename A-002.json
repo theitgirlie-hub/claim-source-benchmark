@@ -1,0 +1,52 @@
+{
+  "schema_version": "0.1",
+  "record_id": "A-002",
+  "claim": {
+    "text": "Industry-group estimates suggested surrogacy generated more than US$2 billion annually, with thousands of IVF clinics across the country.",
+    "context": null,
+    "article": {
+      "title": "Surrogacy in India",
+      "url": "https://en.wikipedia.org/wiki/Surrogacy_in_India",
+      "revision_id": null
+    },
+    "elements": [
+      { "id": 1, "text": "Industry groups estimated that surrogacy generated more than US$2 billion annually" },
+      { "id": 2, "text": "IVF clinics offering surrogacy operated across the country" }
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "S1",
+      "citation": "Hibino, Yuri (7 July 2023). The advantages and disadvantages of altruistic and commercial surrogacy in India. Philosophy, Ethics, and Humanities in Medicine 18(1): 8.",
+      "url": "https://doi.org/10.1186/s13010-023-00130-y",
+      "type": "review",
+      "date": "2023-07-07",
+      "access": "live"
+    }
+  ],
+  "annotator": {
+    "id": "example-annotator",
+    "kind": "human",
+    "date": "2026-11-03"
+  },
+  "assessments": [
+    {
+      "source_id": "S1",
+      "gates": { "G1": "pass", "G2": "pass", "G3": "pass", "G4": "pass" },
+      "element_findings": [
+        { "element_id": 1, "addressed": true, "stated_or_implied": "stated", "evidence": "Background section: industry estimate of US$2.3 billion a year" },
+        { "element_id": 2, "addressed": true, "stated_or_implied": "stated", "evidence": "Background section: many IVF clinics offering surrogacy programs" }
+      ],
+      "scores": { "coverage": 2, "explicitness": 2, "scope": 1, "total": 5 },
+      "caps_triggered": [],
+      "verdict": "Partly supported",
+      "evidence_note": "Found: elements 1 and 2 (Background). Not addressed: none. Scope: the source says 'many' clinics, the claim says 'thousands'. Searched for: clinics, billion, thousands.",
+      "flags": ["borderline"]
+    }
+  ],
+  "overall": {
+    "verdict": "Partly supported",
+    "true_by_other_sources": { "value": "unknown" },
+    "notes": "Illustrative record adapted from a pilot. Not a reference annotation."
+  }
+}

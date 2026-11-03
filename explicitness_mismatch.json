@@ -1,0 +1,44 @@
+{
+  "schema_version": "0.1",
+  "record_id": "INVALID-001",
+  "claim": {
+    "text": "The Example Bridge opened in 1990, is 11.8 km long, and was designed by a foreign firm.",
+    "context": null,
+    "article": { "title": "Example Bridge (invented for this test)", "revision_id": null },
+    "elements": [
+      { "id": 1, "text": "The bridge opened in 1990" },
+      { "id": 2, "text": "The bridge is 11.8 km long" },
+      { "id": 3, "text": "The bridge was designed by a foreign firm" }
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "S1",
+      "citation": "Invented source used only to test the validator.",
+      "type": "news",
+      "date": "2001-05-01",
+      "access": "live"
+    }
+  ],
+  "annotator": { "id": "example-annotator", "kind": "human", "date": "2026-11-03" },
+  "assessments": [
+    {
+      "source_id": "S1",
+      "gates": { "G1": "pass", "G2": "pass", "G3": "pass", "G4": "pass" },
+      "element_findings": [
+        { "element_id": 1, "addressed": true, "stated_or_implied": "stated", "evidence": "paragraph 1" },
+        { "element_id": 2, "addressed": true, "stated_or_implied": "stated", "evidence": "paragraph 2" },
+        { "element_id": 3, "addressed": true, "stated_or_implied": "implied", "evidence": "paragraph 4 (mentions overseas engineers only)" }
+      ],
+      "scores": { "coverage": 2, "explicitness": 2, "scope": 2, "total": 6 },
+      "caps_triggered": [],
+      "verdict": "Supported",
+      "evidence_note": "Found: elements 1 and 2 stated, element 3 only implied. This record is deliberately inconsistent: explicitness should be 1, so the total and verdict are wrong.",
+      "flags": []
+    }
+  ],
+  "overall": {
+    "verdict": "Supported",
+    "true_by_other_sources": { "value": "unknown" }
+  }
+}

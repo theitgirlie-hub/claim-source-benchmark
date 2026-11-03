@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Claim-source annotation (v0.1)",
+  "description": "One record = one claim, judged by one annotator (human or AI) against one or more cited sources, following rubric v0.3.",
+  "type": "object",
+  "required": ["schema_version", "record_id", "claim", "sources", "annotator", "assessments", "overall"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "0.1" },
+    "record_id": { "type": "string", "minLength": 1 },
+
+    "claim": {
+      "type": "object",
+      "required": ["text", "article", "elements"],
+      "additionalProperties": false,
+      "properties": {
+        "text": { "type": "string", "minLength": 1, "description": "The claim verbatim. Never reworded." },
+        "context": { "type": ["string", "null"], "description": "Preceding sentence if the claim cannot stand alone." },
+        "article": {
+          "type": "object",
+          "required": ["title"],
+          "additionalProperties": false,
+          "properties": {
+            "title": { "type": "string", "minLength": 1 },
+            "url": { "type": "string" },
+            "revision_id": { "type": ["integer", "null"], "description": "Wikipedia revision the claim was read from, if known." }
+          }
+        },
+        "elements": {
+          "type": "array",
+          "minItems": 1,
+          "description": "One fact, number, date or causal link each. Qualifiers (first, full, thousands, all) are not elements.",
+          "items": {
+            "type": "object",
+            "required": ["id", "text"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "integer", "minimum": 1 },
+              "text": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["source_id", "citation", "type", "date", "access"],
+        "additionalProperties": false,
+        "properties": {
+          "source_id": { "type": "string", "minLength": 1 },
+          "citation": { "type": "string", "minLength": 1 },
+          "url": { "type": "string" },
+          "archive_url": { "type": "string" },
+          "type": { "enum": ["primary", "review", "news", "other"] },
+          "date": { "type": "string", "pattern": "^(undated|\\d{4}(-\\d{2}(-\\d{2})?)?)$" },
+          "access": { "enum": ["live", "archive", "unavailable"] }
+        }
+      }
+    },
+
+    "annotator": {
+      "type": "object",
+      "required": ["id", "kind", "date"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["human", "ai"] },
+        "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "model": { "type": "string" },
+        "web_access": { "type": "boolean" },
+        "prompt_ref": { "type": "string" }
+      },
+      "if": { "properties": { "kind": { "const": "ai" } } },
+      "then": { "required": ["model", "web_access"] }
+    },
+
+    "assessments": {
+      "type": "array",
+      "minItems": 1,
+      "description": "One assessment per source.",
+      "items": {
+        "type": "object",
+        "required": ["source_id", "gates", "element_findings", "scores", "caps_triggered", "verdict", "evidence_note", "flags"],
+        "additionalProperties": false,
+        "properties": {
+          "source_id": { "type": "string" },
+          "gates": {
+            "type": "object",
+            "required": ["G1", "G2", "G3", "G4"],
+            "additionalProperties": false,
+            "properties": {
+              "G1": { "enum": ["pass", "fail"] },
+              "G2": { "enum": ["pass", "fail"] },
+              "G3": { "enum": ["pass", "partial", "undated", "fail"] },
+              "G4": { "enum": ["pass", "possible", "fail"] }
+            }
+          },
+          "element_findings": {
+            "type": "array",
+            "description": "Empty only if a gate stopped scoring.",
+            "items": {
+              "type": "object",
+              "required": ["element_id", "addressed", "stated_or_implied", "evidence"],
+              "additionalProperties": false,
+              "properties": {
+                "element_id": { "type": "integer", "minimum": 1 },
+                "addressed": { "type": "boolean" },
+                "stated_or_implied": { "enum": ["stated", "implied", "n/a"] },
+                "evidence": { "type": "string", "description": "Section or paragraph pointer, or a short phrase." }
+              }
+            }
+          },
+          "scores": {
+            "type": "object",
+            "required": ["coverage", "explicitness", "scope", "total"],
+            "additionalProperties": false,
+            "properties": {
+              "coverage": { "type": ["integer", "null"], "minimum": 0, "maximum": 2 },
+              "explicitness": { "type": ["integer", "null"], "minimum": 0, "maximum": 2 },
+              "scope": { "type": ["integer", "null"], "minimum": 0, "maximum": 2 },
+              "total": { "type": ["integer", "null"], "minimum": 0, "maximum": 6 }
+            }
+          },
+          "caps_triggered": {
+            "type": "array",
+            "items": { "enum": ["explicitness_zero", "scope_zero", "fewer_than_half_addressed"] },
+            "uniqueItems": true
+          },
+          "verdict": { "$ref": "#/$defs/verdict" },
+          "evidence_note": { "type": "string", "minLength": 1, "description": "Found: ... Not addressed: ... Searched for: ..." },
+          "flags": {
+            "type": "array",
+            "items": { "enum": ["possible conflict", "sources conflict", "undated source", "partial access", "near-verbatim match", "borderline"] },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+
+    "overall": {
+      "type": "object",
+      "required": ["verdict", "true_by_other_sources"],
+      "additionalProperties": false,
+      "properties": {
+        "verdict": { "$ref": "#/$defs/verdict" },
+        "true_by_other_sources": {
+          "type": "object",
+          "required": ["value"],
+          "additionalProperties": false,
+          "properties": {
+            "value": { "enum": ["yes", "no", "unknown"] },
+            "source": { "type": "string" }
+          }
+        },
+        "notes": { "type": "string" }
+      }
+    }
+  },
+
+  "$defs": {
+    "verdict": {
+      "enum": [
+        "Supported",
+        "Partly supported",
+        "Compatible but not confirmed",
+        "Not supported (on topic but silent)",
+        "Not supported (off-topic)",
+        "Not supported (source predates event)",
+        "Contradicted",
+        "Can't check"
+      ]
+    }
+  }
+}
